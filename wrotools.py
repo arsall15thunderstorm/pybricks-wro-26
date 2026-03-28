@@ -212,7 +212,7 @@ def gyroStraight(min_speed: float, target_distance: int, backwards: bool) -> Non
     left_motor.hold()
     right_motor.hold()
 
-def turnGyro(target_angle: int, turn_speed: int, clockwise: bool) -> None:
+def gyroTurn(target_angle: int, turn_speed: int, clockwise: bool) -> None:
 
     """
     Turns the robot to a target angle using the gyro sensor
@@ -252,6 +252,6 @@ def turnGyro(target_angle: int, turn_speed: int, clockwise: bool) -> None:
 
 
 for i in range(4):
-    
+
     gyroStraight(10, 200, False)
-    turnGyro(90, 20, True)
+    gyroTurn(90, 20, True)
