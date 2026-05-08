@@ -1,6 +1,6 @@
 # WRO TOOLS FILE
-# version: 1.00
-# date: 14/3/2026
+# version: 1.01
+# date: 6/5/2026
 
 
 import umath
@@ -13,7 +13,7 @@ from pybricks.tools import wait, StopWatch
 
 # MATH STUFF
 
-pi = umath.pi
+pi: float = umath.pi
 
 # ROBOT HARDWARE DETAILS
 
@@ -23,19 +23,25 @@ distance_between_wheels: int = 200
 
 # INITIALIZATION            
 
-hub = PrimeHub()
-left_motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
-right_motor = Motor(Port.A)
-color_sensor1 = ColorSensor(Port.C)
-# color_sensor2 = ColorSensor(Port.D)
-# attachment_motor1 = Motor(Port.E)
-# attachment_motor2 = Motor(Port.F)
-db = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
+hub: PrimeHub = PrimeHub()
+left_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
+right_motor: Motor = Motor(Port.A)
+color_sensor1: ColorSensor = ColorSensor(Port.C)
+# color_sensor2: ColorSensor = ColorSensor(Port.D)
+# attachment_motor1: Motor = Motor(Port.E)
+# attachment_motor2: Motor = Motor(Port.F)
+db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
 db.use_gyro(True)
 watch = StopWatch()
 watch.reset()
 db.reset()
 hub.imu.reset_heading(0)
+coordinates: list[float] = [0.0, 0.0]
+
+current_heading_offset = 0.0
+
+
+
 
 # CONSTANTS
 
@@ -65,6 +71,15 @@ part3: float = 0.2 * target_distance
 
 
 # HELPER FUNCTIONS
+
+def updateCoordinates(distance_mm: float) -> None:
+    angle_rad = umath.radians(hub.imu.heading())
+
+    delta_x = distance_mm * umath.cos(angle_rad)
+    delta_y = distance_mm * umath.sin(angle_rad)
+
+    coordinates[0] += delta_x
+    coordinates[1] += delta_y
 
 def startMovingAtSpeeds(speed1: int, speed2: int) -> None:
     """
@@ -101,7 +116,7 @@ def resetDB() -> None:
     print("reset complete")
     wait(50)
 
-def mm_to_degrees(mm: int) -> float:
+def mmToDegrees(mm: int) -> float:
     """
     Converts mm distance to a degrees value for the motors to move
     
@@ -113,7 +128,7 @@ def mm_to_degrees(mm: int) -> float:
 
     return (mm/wheel_circumference) * 360
 
-def convert_speed(speed: int, isLargeMotor: bool) -> float:
+def convertSpeed(speed: int, isLargeMotor: bool) -> float:
     """
     Converts percentage speed to degrees per second
     
@@ -145,7 +160,7 @@ def gyroStraight(min_speed: float, target_distance: int, backwards: bool) -> Non
 
     resetDB()
 
-    def kp_control(base_speed: float, target_distance: int) -> tuple[float, float, float]:
+    def kpControl(base_speed: float, target_distance: int) -> tuple[float, float, float]:
 
         """
         Controls and calculates the PID based motor speeds and correction
@@ -202,7 +217,7 @@ def gyroStraight(min_speed: float, target_distance: int, backwards: bool) -> Non
         else:
             speed = max_speed
 
-        left_speed, right_speed, correction = kp_control(speed, target_distance)
+        left_speed, right_speed, correction = kpControl(speed, target_distance)
 
         left_speed,right_speed = [-left_speed if backwards else left_speed, -right_speed if backwards else right_speed]
 
@@ -215,6 +230,9 @@ def gyroStraight(min_speed: float, target_distance: int, backwards: bool) -> Non
 
     left_motor.hold()
     right_motor.hold()
+
+    dist_moved = -target_distance if backwards else target_distance
+    updateCoordinates(dist_moved)
 
 def gyroTurn(target_angle: int, turn_speed: int, clockwise: bool) -> None:
 
@@ -238,7 +256,7 @@ def gyroTurn(target_angle: int, turn_speed: int, clockwise: bool) -> None:
         if abs(error) <= 2:
             break
 
-        speed = convert_speed(turn_speed, True)
+        speed = convertSpeed(turn_speed, True)
 
         if error > 0:
             left_motor.run(speed if clockwise else -speed)
@@ -255,15 +273,6 @@ def gyroTurn(target_angle: int, turn_speed: int, clockwise: bool) -> None:
     right_motor.hold()
 
 
-# TESTING GYRO FUNCTIONS AGAINST BUILT IN FUNCTIONS
-
-for i in range(4):
-    gyroStraight(10, 200, False)
-    gyroTurn(90, 20, True)
-
-for i in range(4):
-    db.straight(200)
-    db.turn(90)
 
 
 
