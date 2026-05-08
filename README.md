@@ -1,8 +1,9 @@
 Pybricks code for wro 2026
-Python and virtual environment set up with pyenv
+Spike PRIME
+Python and virtual environment set up with UV
 
 # Dependencies:
-- Python 3.10-12
+- Python 3.12
 - pybricksdev package
 
 

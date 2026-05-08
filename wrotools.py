@@ -3,7 +3,7 @@
 # date: 14/3/2026
 
 
-import math
+import umath
 
 from pybricks.hubs import PrimeHub
 from pybricks.pupdevices import Motor, ColorSensor, UltrasonicSensor, ForceSensor
@@ -13,7 +13,7 @@ from pybricks.tools import wait, StopWatch
 
 # MATH STUFF
 
-pi = math.pi
+pi = umath.pi
 
 # ROBOT HARDWARE DETAILS
 
