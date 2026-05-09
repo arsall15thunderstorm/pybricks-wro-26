@@ -30,11 +30,10 @@ color_sensor1: ColorSensor = ColorSensor(Port.C)
 # color_sensor2: ColorSensor = ColorSensor(Port.D)
 # attachment_motor1: Motor = Motor(Port.E)
 # attachment_motor2: Motor = Motor(Port.F)
-db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
-db.use_gyro(True)
+#db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
+#db.use_gyro(True)
 watch = StopWatch()
 watch.reset()
-db.reset()
 hub.imu.reset_heading(0)
 coordinates: list[float] = [0.0, 0.0]
 
@@ -117,7 +116,7 @@ def resetDB() -> None:
     Resets the driving base
     """
 
-    db.reset()
+    #db.reset()
     hub.imu.reset_heading(0)
     print("reset complete")
     wait(50)
@@ -164,7 +163,8 @@ def gyroStraight(min_speed: float, target_distance: float, backwards: bool) -> N
     :type backwards: bool
     """
 
-    resetDB()
+    left_motor.reset_angle(0)
+    right_motor.reset_angle(0)
 
     def kpControl(base_speed: float, target_distance: float) -> tuple[float, float, float]:
 
@@ -240,7 +240,7 @@ def gyroStraight(min_speed: float, target_distance: float, backwards: bool) -> N
     dist_moved = -target_distance if backwards else target_distance
     updateCoordinates(dist_moved)
 
-def gyroTurn(target_angle: float, turn_speed: int, clockwise: bool) -> None:
+def gyroTurn(target_angle: float, turn_speed: int) -> None:
 
     """
     Turns the robot to a target angle using the gyro sensor
@@ -252,31 +252,18 @@ def gyroTurn(target_angle: float, turn_speed: int, clockwise: bool) -> None:
     :param clockwise: Whether the robot will turn clockwise or counterclockwise
     :type clockwise: bool
     """
-
-    resetDB()
-
-    while True:
-        current_angle = hub.imu.heading()
-        error = (target_angle - current_angle + 180) % 360 - 180
-
-        if abs(error) <= 2:
-            break
-
-        speed = convertSpeed(turn_speed, True)
-
-        if error > 0:
-            left_motor.run(speed if clockwise else -speed)
-            right_motor.run(-speed if clockwise else speed)
-        else:
-            left_motor.run(-speed if clockwise else speed)
-            right_motor.run(speed if clockwise else -speed)
-
-        wait(10)
-
-        print(f'Current Angle: {current_angle}, Error: {error}')
+    left_motor.reset_angle(0)
+    right_motor.reset_angle(0)
+    
+    while abs(hub.imu.heading()) < abs(target_angle) - 1:
+        correction = target_angle - hub.imu.heading()
+        startDCAtSpeeds(turn_speed + correction, turn_speed - correction)
 
     left_motor.hold()
     right_motor.hold()
+
+    
+
 
 
 def moveToCoordinates(target_x: float, target_y: float, move_speed: int) -> None:
@@ -295,16 +282,12 @@ def moveToCoordinates(target_x: float, target_y: float, move_speed: int) -> None
     angle = umath.degrees(umath.atan2(target_y - coordinates[1], target_x - coordinates[0]))
     distance = umath.sqrt((target_x - coordinates[0])**2 + (target_y - coordinates[1])**2)
 
-    gyroTurn(angle, move_speed, True)
+    gyroTurn(angle, move_speed)
     gyroStraight(move_speed, int(distance), False)
 
 
 
-tasks: list = [
-    [],
-    [],
-    []
-]
+gyroTurn(90, 10)
 
 
 
