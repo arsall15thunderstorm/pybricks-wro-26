@@ -24,14 +24,14 @@ distance_between_wheels: int = 200
 # INITIALIZATION            
 
 hub: PrimeHub = PrimeHub()
-left_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
-right_motor: Motor = Motor(Port.A)
-color_sensor1: ColorSensor = ColorSensor(Port.C)
+left_motor: Motor = Motor(Port.F, Direction.COUNTERCLOCKWISE)
+right_motor: Motor = Motor(Port.B)
+#color_sensor1: ColorSensor = ColorSensor(Port.C)
 # color_sensor2: ColorSensor = ColorSensor(Port.D)
-# attachment_motor1: Motor = Motor(Port.E)
-# attachment_motor2: Motor = Motor(Port.F)
-#db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
-#db.use_gyro(True)
+attachment_left: Motor = Motor(Port.E)
+attachment_right: Motor = Motor(Port.A)
+db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
+db.use_gyro(True)
 watch = StopWatch()
 watch.reset()
 hub.imu.reset_heading(0)
@@ -71,6 +71,7 @@ part3: float = 0.2 * target_distance
 
 # HELPER FUNCTIONS
 
+
 def setCoordinates(x: float, y: float) -> None:
     global coordinates
 
@@ -86,14 +87,18 @@ def updateCoordinates(distance_mm: float) -> None:
     coordinates[0] += delta_x
     coordinates[1] += delta_y
 
-def startMovingAtSpeeds(speed1: int, speed2: int) -> None:
+
+
+def startMovingAtSpeeds(speed1: float, speed2: float) -> None:
     """
     Starts moving both motors at individually controlled speeds
     
     :param speed1: Speed value of the left motor
-    :type speed1: int
+    :type speed1: inted)
+        wait(10)
+
     :param speed2: Speed value of the right motor
-    :type speed2: int
+    :type speed2: intfrom wrotools import *
     """
 
     left_motor.run(speed1)
@@ -110,6 +115,8 @@ def startDCAtSpeeds(speed1: float, speed2: float) -> None:
     """
     left_motor.dc(speed1)
     right_motor.dc(speed2)
+
+
 
 def resetDB() -> None:
     """
@@ -133,7 +140,7 @@ def mmToDegrees(mm: int) -> float:
 
     return (mm/wheel_circumference) * 360
 
-def convertSpeed(speed: int, isLargeMotor: bool) -> float:
+def convertSpeed(speed: float, isLargeMotor: bool) -> float:
     """
     Converts percentage speed to degrees per second
     
@@ -165,6 +172,7 @@ def gyroStraight(min_speed: float, target_distance: float, backwards: bool) -> N
 
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
+    
 
     def kpControl(base_speed: float, target_distance: float) -> tuple[float, float, float]:
 
@@ -215,6 +223,7 @@ def gyroStraight(min_speed: float, target_distance: float, backwards: bool) -> N
         if current_distance >= target_distance:
             break
 
+
         
         if current_distance <= part1:
             speed = (max_speed - min_speed) / part1 * current_distance + min_speed
@@ -238,7 +247,8 @@ def gyroStraight(min_speed: float, target_distance: float, backwards: bool) -> N
     right_motor.hold()
 
     dist_moved = -target_distance if backwards else target_distance
-    updateCoordinates(dist_moved)
+    #updateCoordinates(dist_moved)
+
 
 def gyroTurn(target_angle: float, turn_speed: int) -> None:
 
@@ -252,6 +262,7 @@ def gyroTurn(target_angle: float, turn_speed: int) -> None:
     :param clockwise: Whether the robot will turn clockwise or counterclockwise
     :type clockwise: bool
     """
+
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
     
@@ -262,11 +273,48 @@ def gyroTurn(target_angle: float, turn_speed: int) -> None:
     left_motor.hold()
     right_motor.hold()
 
+
+
+def raedGyroTurn(target_angle: float, max_speed: int) -> None:
+    # Use a simple Proportional gain (Kp)
+    # Adjust this value (0.5 - 2.0) if the turn is too jerky or too slow
+    turn_kp = 1.5 
+    
+    while True:
+        # Calculate how far we are from the target
+        error = target_angle - hub.imu.heading()
+        
+        # If we are within 1 degree, stop
+        if abs(error) <= 1:
+            break
+            
+        # Calculate speed based on error
+        speed = error * turn_kp
+        
+        # Ensure speed doesn't exceed your limit, but stays above 
+        # a 'minimum' to prevent stalling (e.g., 12%)
+        if speed > 0:
+            speed = max(12, min(speed, max_speed))
+        else:
+            speed = min(-12, max(speed, -max_speed))
+            
+        # Pivot: Left motor moves opposite of Right motor
+        startDCAtSpeeds(speed, -speed)
+        wait(10)
+
+    left_motor.hold()
+    right_motor.hold()
+
+
     
 
+def dbMoveWrapper(distance):
+    db.straight(distance)
+    updateCoordinates(distance)
 
 
-def moveToCoordinates(target_x: float, target_y: float, move_speed: int) -> None:
+
+def moveToCoordinates(target_x: float, target_y: float) -> None:
     
     """
     Moves the robot to a target coordinate using the gyro sensor and odometry
@@ -282,12 +330,11 @@ def moveToCoordinates(target_x: float, target_y: float, move_speed: int) -> None
     angle = umath.degrees(umath.atan2(target_y - coordinates[1], target_x - coordinates[0]))
     distance = umath.sqrt((target_x - coordinates[0])**2 + (target_y - coordinates[1])**2)
 
-    gyroTurn(angle, move_speed)
-    gyroStraight(move_speed, int(distance), False)
+    db.turn(angle)
+    db.straight(int(distance))
+    db.turn(-angle)
 
 
-
-gyroTurn(90, 10)
 
 
 
