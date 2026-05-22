@@ -3,10 +3,13 @@ from wrotools import *
 async def main():
     #await moveAttachmentArms(30, -270)
     await moveAttachmentArms(30, 360+180)
-    await db.straight(180)
+    await db.straight(200)
     await db.turn(90)
     await db.straight(300)
     await moveAttachmentArms(30, -270)
+    await db.straight(-300)
+    await db.turn(90)
+    await db.straight(500)
     
 
     
