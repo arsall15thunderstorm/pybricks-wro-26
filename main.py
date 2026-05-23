@@ -16,7 +16,5 @@ async def main():
     await db.straight(200)
     await moveAttachmentArms(30, 270)
 
-    # meeko was here
-
 if __name__ == "__main__":
     run_task(main())
