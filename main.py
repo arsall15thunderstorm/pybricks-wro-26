@@ -6,6 +6,7 @@ async def main():
     await db.straight(200)
     await db.turn(90)
     await db.straight(275)
+    
     await moveAttachmentArms(30, -270)
     await db.straight(-300)
     await db.turn(90)
