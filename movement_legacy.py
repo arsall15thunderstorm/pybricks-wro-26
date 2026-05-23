@@ -113,8 +113,6 @@ def startDCAtSpeeds(speed1: float, speed2: float) -> None:
     left_motor.dc(speed1)
     right_motor.dc(speed2)
 
-#surpise motherfucker
-
 def resetDB() -> None:
     """
     Resets the driving base
