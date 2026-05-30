@@ -26,7 +26,7 @@ distance_between_wheels: int = 200
 hub: PrimeHub = PrimeHub()
 left_motor: Motor = Motor(Port.F, Direction.COUNTERCLOCKWISE)
 right_motor: Motor = Motor(Port.B)
-#color_sensor1: ColorSensor = ColorSensor(Port.D)
+color_sensor1: ColorSensor = ColorSensor(Port.C)
 attachment_left: Motor = Motor(Port.E)
 attachment_right: Motor = Motor(Port.A)
 db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
@@ -138,6 +138,15 @@ async def moveAttachmentArms(speed, angle):
         
     
     await multitask(move_right(), move_left())
+
+def waitForColor(desired_color: Color):
+    while color_sensor1.hsv() != desired_color:
+        wait(20)
+
+def moveUntilColor(desired_color, speed):
+    db.drive(100, convertSpeed(speed, True))
+    waitForColor(desired_color)
+    db.brake()
 
 # not used and will not be used for a while:
 
