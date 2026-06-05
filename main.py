@@ -2,9 +2,9 @@ from wrotools import *
 
 async def main():
     #await moveAttachmentArms(30, -270)
-    await db.straight(200)
+    await db.straight(90)
     await db.turn(90)
-    await db.straight(200)
+    await db.straight(330)
     await moveAttachmentArms(30, 450)
     await db.straight(115)    
     await moveAttachmentArms(30, -390)
