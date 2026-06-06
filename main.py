@@ -15,7 +15,7 @@ async def main():
     await db.turn(90)
     await db.straight(250)
     await db.turn(-90)
-    awwait db.straight(750)
+    await db.straight(750)
     await db.turn(-90)
     await db.straight(270)
     await db.turn(90)
