@@ -7,13 +7,15 @@ async def main():
     await moveAttachmentArms(30, 450)
     await db.straight(190)
     await db.turn(90)
-    await db.straight(300)
+    await db.straight(305)
     
     #await db.straight(115)    
     await moveAttachmentArms(30, -390)
     await db.straight(-325)
     await db.turn(90)
-    await db.straight(1000)
+    await db.straight(250)
+    await db.turn(-90)
+    awwait db.straight(750)
     await db.turn(-90)
     await db.straight(270)
     await db.turn(90)
@@ -31,7 +33,8 @@ async def main():
     
 
 if __name__ == "__main__":
-    db.distance_control.pid()
+    #current_pid = db.distance_control.pid(16,994)
+    #print(current_pid)
     run_task(main())
  
  
