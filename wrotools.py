@@ -24,7 +24,7 @@ distance_between_wheels: int = 200
 # INITIALIZATION            
 
 hub: PrimeHub = PrimeHub()
-left_motor: Motor = Motor(Port.F, Direction.COUNTERCLOCKWISE)
+left_motor: Motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
 right_motor: Motor = Motor(Port.B)
 color_sensor1: ColorSensor = ColorSensor(Port.C)
 attachment_left: Motor = Motor(Port.E)
