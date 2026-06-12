@@ -25,8 +25,8 @@ distance_between_wheels: int = 200
 # INITIALIZATION            
 
 hub: PrimeHub = PrimeHub()
-left_motor: Motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
-right_motor: Motor = Motor(Port.B)
+left_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
+right_motor: Motor = Motor(Port.D)
 color_sensor1: ColorSensor = ColorSensor(Port.C)
 attachment_left: Motor = Motor(Port.E)
 attachment_right: Motor = Motor(Port.A)
@@ -49,18 +49,6 @@ def resetDB() -> None:
     right_motor.reset_angle(0)
     print("reset complete")
     wait(50)
-
-def mmToDegrees(mm: int) -> float:
-    """
-    Converts mm distance to a degrees value for the motors to move
-    
-    :param mm: The distance in mm being converted
-    :type mm: int
-    :return: The converted degrees value of the mm value
-    :rtype: float
-    """
-
-    return (mm/wheel_circumference) * 360
 
 def convertSpeed(speed: float) -> float:
     """
@@ -96,11 +84,11 @@ async def moveAttachmentArms(speed, angle):
 async def moveUntilColor(reflection, speed):
 
     async def waitForColor():
-        while await color_sensor1.reflection() != reflection:
+        while await color_sensor1.reflection() > reflection:
             await wait(10)
 
     async def driveForever():
-        db.drive(0.6*speed, 0)
+        db.drive(0.6*convertSpeed(speed), 0)
 
         while True:
             await wait(10)
@@ -111,3 +99,6 @@ async def moveUntilColor(reflection, speed):
 
     db.brake()
  
+
+async def move(mm):
+    await db.straight(mm)
