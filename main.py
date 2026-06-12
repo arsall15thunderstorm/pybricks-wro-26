@@ -1,4 +1,6 @@
-from wrotools import *
+from wrotools import db, moveUntilColor, moveAttachmentArms
+from pybricks.tools import run_task
+import gc
 
 
 
@@ -27,6 +29,8 @@ async def main():
     #await db.turn(90)
     #await db.straight(270)
     #await db.turn(-90)"""
+
+    gc.collect()
     
 
 

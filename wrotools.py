@@ -93,15 +93,15 @@ async def moveAttachmentArms(speed, angle):
 
 
 
-async def moveUntilColor(desired_color, speed):
+async def moveUntilColor(reflection, speed):
 
     async def waitForColor():
-        while color_sensor1.color() != desired_color:
+        while await color_sensor1.reflection() != reflection:
             await wait(10)
 
     async def driveForever():
         db.drive(0.6*speed, 0)
-        
+
         while True:
             await wait(10)
     
