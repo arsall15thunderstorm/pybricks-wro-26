@@ -11,6 +11,7 @@ from pybricks.parameters import Button, Color, Direction, Port, Side, Stop
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait, StopWatch, run_task, multitask
 
+
 # MATH STUFF
 
 pi: float = umath.pi
@@ -34,27 +35,9 @@ db.use_gyro(True)
 watch = StopWatch()
 watch.reset()
 hub.imu.reset_heading(0)
-coordinates: list[float] = [0.0, 0.0]
 
 
 # HELPER FUNCTIONS
-
-
-def setCoordinates(x: float, y: float) -> None:
-    global coordinates
-
-    coordinates[0] = x
-    coordinates[1] = y
-
-def updateCoordinates(distance_mm: float) -> None:
-    angle_rad = umath.radians(hub.imu.heading())
-
-    delta_x = distance_mm * umath.cos(angle_rad)
-    delta_y = distance_mm * umath.sin(angle_rad)
-
-    coordinates[0] += delta_x
-    coordinates[1] += delta_y
-
 
 def resetDB() -> None:
     """
@@ -79,7 +62,7 @@ def mmToDegrees(mm: int) -> float:
 
     return (mm/wheel_circumference) * 360
 
-def convertSpeed(speed: float, isLargeMotor: bool) -> float:
+def convertSpeed(speed: float) -> float:
     """
     Converts percentage speed to degrees per second
     
@@ -90,44 +73,13 @@ def convertSpeed(speed: float, isLargeMotor: bool) -> float:
     :return: The converted degrees per second measure of the percentage speed
     :rtype: float
     """
+    return (speed/100) * 1050
 
-    if isLargeMotor:
-        return (speed/100) * 1050
-    else:
-        return (speed/100) * 111
-
-    
-
-def dbMoveWrapper(distance):
-    db.straight(distance)
-    updateCoordinates(distance)
-
-
-
-def moveToCoordinates(target_x: float, target_y: float) -> None:
-    
-    """
-    Moves the robot to a target coordinate using the gyro sensor and odometry
-    
-    :param target_x: The x coordinate the robot will move to
-    :type target_x: float
-    :param target_y: The y coordinate the robot will move to
-    :type target_y: float
-    :param move_speed: The speed the robot will move at
-    :type move_speed: int
-    """
-
-    angle = umath.degrees(umath.atan2(target_y - coordinates[1], target_x - coordinates[0]))
-    distance = umath.sqrt((target_x - coordinates[0])**2 + (target_y - coordinates[1])**2)
-
-    db.turn(angle)
-    db.straight(int(distance))
-    db.turn(-angle)
 
 
 async def moveAttachmentArms(speed, angle):
-    speed1 = convertSpeed(-speed, True)
-    speed2 = convertSpeed(speed, True)
+    speed1 = convertSpeed(-speed)
+    speed2 = convertSpeed(speed)
     
 
     async def move_right():
@@ -143,54 +95,19 @@ async def moveAttachmentArms(speed, angle):
 
 async def moveUntilColor(desired_color, speed):
 
-    async def waitForColor(desired_color: Color):
+    async def waitForColor():
         while color_sensor1.color() != desired_color:
             await wait(10)
 
     async def driveForever():
-        db.drive(150, 0)
+        db.drive(0.6*speed, 0)
+        
+        while True:
+            await wait(10)
     
-    while True:
-        await wait(10)
 
     
-    await multitask(driveForever(), waitForColor(desired_color))
+    await multitask(driveForever(), waitForColor(), race=True)
 
-# not used and will not be used for a while:
-
-
-def startMovingAtSpeeds(speed1: float, speed2: float) -> None:
-    """
-    Starts moving both motors at individually controlled speeds
-    
-    :param speed1: Speed value of the left motor
-    :type speed1: inted)
-        wait(10)
-
-    :param speed2: Speed value of the right motor
-    :type speed2: intfrom wrotools import *
-    """
-
-    left_motor.run(speed1)
-    right_motor.run(speed2)
-
-
-def startDCAtSpeeds(speed1: float, speed2: float) -> None:
-    """
-    Starts individually moving the motors with motor.dc()
-    
-    :param speed1: Speed value of the left motor
-    :type speed1: float
-    :param speed2: Speed value of the right motor
-    :type speed2: float
-    """
-    left_motor.dc(speed1)
-    right_motor.dc(speed2)
-
-
-
-
-
-
-
-
+    db.brake()
+ 

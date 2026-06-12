@@ -3,7 +3,9 @@ from wrotools import *
 
 
 async def main():
-    #await moveAttachmentArms(30, -270)
+    """the main function"""
+
+    """#await moveAttachmentArms(30, -270)
     await moveAttachmentArms(30, 450)
     await db.straight(190)
     await db.turn(90)
@@ -24,14 +26,13 @@ async def main():
     #await db.straight(-270)
     #await db.turn(90)
     #await db.straight(270)
-    #await db.turn(-90)
+    #await db.turn(-90)"""
     
 
 
     
 
 if __name__ == "__main__":
-    db.distance_control.pid()
     run_task(main())
  
  
