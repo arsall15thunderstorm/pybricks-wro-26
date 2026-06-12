@@ -24,22 +24,39 @@ distance_between_wheels: int = 200
 # INITIALIZATION            
 
 hub: PrimeHub = PrimeHub()
-left_motor: Motor = Motor(Port.D)
-right_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
+left_motor: Motor = Motor(Port.D, Direction.COUNTERCLOCKWISE)
+right_motor: Motor = Motor(Port.B)
 color_sensor1: ColorSensor = ColorSensor(Port.C)
 attachment_left: Motor = Motor(Port.E)
 attachment_right: Motor = Motor(Port.A)
 db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
-db.use_gyro(False)
+db.use_gyro(True)
 watch = StopWatch()
 watch.reset()
 hub.imu.reset_heading(0)
+coordinates: list[float] = [0.0, 0.0]
+
 
 # HELPER FUNCTIONS
 
 
+def setCoordinates(x: float, y: float) -> None:
+    global coordinates
 
-async def resetDB() -> None:
+    coordinates[0] = x
+    coordinates[1] = y
+
+def updateCoordinates(distance_mm: float) -> None:
+    angle_rad = umath.radians(hub.imu.heading())
+
+    delta_x = distance_mm * umath.cos(angle_rad)
+    delta_y = distance_mm * umath.sin(angle_rad)
+
+    coordinates[0] += delta_x
+    coordinates[1] += delta_y
+
+
+def resetDB() -> None:
     """
     Resets the driving base
     """
@@ -47,9 +64,8 @@ async def resetDB() -> None:
     db.reset()
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
-    hub.imu.reset_heading(0)
     print("reset complete")
-    await wait(50)
+    wait(50)
 
 def mmToDegrees(mm: int) -> float:
     """
@@ -80,6 +96,34 @@ def convertSpeed(speed: float, isLargeMotor: bool) -> float:
     else:
         return (speed/100) * 111
 
+    
+
+def dbMoveWrapper(distance):
+    db.straight(distance)
+    updateCoordinates(distance)
+
+
+
+def moveToCoordinates(target_x: float, target_y: float) -> None:
+    
+    """
+    Moves the robot to a target coordinate using the gyro sensor and odometry
+    
+    :param target_x: The x coordinate the robot will move to
+    :type target_x: float
+    :param target_y: The y coordinate the robot will move to
+    :type target_y: float
+    :param move_speed: The speed the robot will move at
+    :type move_speed: int
+    """
+
+    angle = umath.degrees(umath.atan2(target_y - coordinates[1], target_x - coordinates[0]))
+    distance = umath.sqrt((target_x - coordinates[0])**2 + (target_y - coordinates[1])**2)
+
+    db.turn(angle)
+    db.straight(int(distance))
+    db.turn(-angle)
+
 
 async def moveAttachmentArms(speed, angle):
     speed1 = convertSpeed(-speed, True)
@@ -95,25 +139,20 @@ async def moveAttachmentArms(speed, angle):
     
     await multitask(move_right(), move_left())
 
-def waitForColor(reflection: int):
-    while color_sensor1.reflection() > 20:
-        wait(10)
+def waitForColor(desired_color: Color):
+    while color_sensor1.hsv() != desired_color:
+        wait(20)
 
 def moveUntilColor(desired_color, speed):
-    deg_per_second = convertSpeed(speed, isLargeMotor=True)
-    speed_mm_s = (deg_per_second / 360.0) * wheel_circumference
-    db.drive(speed_mm_s, 0)
+    db.drive(100, convertSpeed(speed, True))
     waitForColor(desired_color)
     db.brake()
 
-def detectColor(sensor: ColorSensor):
-    values = [sensor.reflection(), sensor.hsv(), sensor.color()]
-    print(f"Reflection = {values[0]}, HSV = {values[1]}, Color = {values[2]}")
-    return values
+# not used and will not be used for a while:
 
-"""
+
 def startMovingAtSpeeds(speed1: float, speed2: float) -> None:
-    
+    """
     Starts moving both motors at individually controlled speeds
     
     :param speed1: Speed value of the left motor
@@ -122,26 +161,23 @@ def startMovingAtSpeeds(speed1: float, speed2: float) -> None:
 
     :param speed2: Speed value of the right motor
     :type speed2: intfrom wrotools import *
-    
+    """
 
     left_motor.run(speed1)
     right_motor.run(speed2)
 
 
 def startDCAtSpeeds(speed1: float, speed2: float) -> None:
-    
+    """
     Starts individually moving the motors with motor.dc()
     
     :param speed1: Speed value of the left motor
     :type speed1: float
     :param speed2: Speed value of the right motor
     :type speed2: float
-    
+    """
     left_motor.dc(speed1)
     right_motor.dc(speed2)
-    
-"""
-
 
 
 

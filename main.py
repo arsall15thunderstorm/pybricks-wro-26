@@ -1,14 +1,9 @@
 from wrotools import *
-import gc
 
 
 
 async def main():
     #await moveAttachmentArms(30, -270)
-
-    
-
-    """await db.straight(-500)
     await moveAttachmentArms(30, 450)
     await db.straight(190)
     await db.turn(90)
@@ -29,27 +24,14 @@ async def main():
     #await db.straight(-270)
     #await db.turn(90)
     #await db.straight(270)
-    #await db.turn(-90)"""
-
-
-    await db.straight(-500)
-    gc.collect()
-    db.drive(100, 0)
-
-    while color_sensor1.reflection() > 20:
-        await wait(10)
-        print(f"{color_sensor1.color()}, {color_sensor1.reflection()}")
-
-    db.brake()
-    gc.collect()
-    
+    #await db.turn(-90)
     
 
-    
 
+    
 
 if __name__ == "__main__":
-    detectColor(color_sensor1)
-    run_task(main( ))
+    db.distance_control.pid()
+    run_task(main())
  
  
