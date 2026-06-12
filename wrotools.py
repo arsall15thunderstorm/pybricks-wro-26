@@ -139,14 +139,22 @@ async def moveAttachmentArms(speed, angle):
     
     await multitask(move_right(), move_left())
 
-def waitForColor(desired_color: Color):
-    while color_sensor1.hsv() != desired_color:
-        wait(20)
 
-def moveUntilColor(desired_color, speed):
-    db.drive(100, convertSpeed(speed, True))
-    waitForColor(desired_color)
-    db.brake()
+
+async def moveUntilColor(desired_color, speed):
+
+    async def waitForColor(desired_color: Color):
+        while color_sensor1.color() != desired_color:
+            await wait(10)
+
+    async def driveForever():
+        db.drive(150, 0)
+    
+    while True:
+        await wait(10)
+
+    
+    await multitask(driveForever(), waitForColor(desired_color))
 
 # not used and will not be used for a while:
 
