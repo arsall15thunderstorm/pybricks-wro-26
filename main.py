@@ -57,7 +57,7 @@ async def main():
     await moveUntilColor(15,30)
     await multitask(move(305), moveAttachmentArms(30, -260))
     await db.turn(-90)
-    await db.straight(205)
+    await db.straight(209)
     await moveAttachmentArms(30,260)
     await db.straight(-200)
 
