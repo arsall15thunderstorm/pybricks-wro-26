@@ -56,8 +56,6 @@ def convertSpeed(speed: float) -> float:
     
     :param speed: The percentage speed being converted
     :type speed: int
-    :param isLargeMotor: Controls whether the motor is a large or medium motor
-    :type isLargeMotor: bool
     :return: The converted degrees per second measure of the percentage speed
     :rtype: float
     """
@@ -81,21 +79,29 @@ async def moveAttachmentArms(speed, angle):
 
 
 
-async def moveUntilColor(reflection, speed):
+async def moveUntilColor(reflection, speed, distance):
 
     async def waitForColor():
         while await color_sensor1.reflection() > reflection:
             await wait(10)
 
     async def driveForever():
-        db.drive(0.6*convertSpeed(speed), 0)
+        db.drive(0.6004*convertSpeed(speed), 0)
 
         while True:
             await wait(10)
     
-
+    async def detectDistance():
+        while True:
+            distance_moved = 0.6004*right_motor.angle()
+            if distance_moved >= distance:
+                break
+            await wait(10)
+        
     
-    await multitask(driveForever(), waitForColor(), race=True)
+    await resetDB()
+    
+    await multitask(driveForever(), waitForColor(), detectDistance(), race=True)
 
     db.brake()
  
@@ -108,6 +114,7 @@ async def yellowTowers():
 
     # calibration
     await multitask(async_wrapper(db.straight, -500), moveAttachmentArms(40, 450))
+    hub.imu.reset_heading(0)
 
     # picking up the towers
     await db.straight(256) 
@@ -119,7 +126,7 @@ async def yellowTowers():
     await db.straight(-30)
     await db.turn(90)
     await db.straight(500)
-    await moveUntilColor(15, 40)
+    await moveUntilColor(15, 40, 100) # add distance
     await db.straight(440)
     await moveAttachmentArms(40,260)
     await db.straight(-200)
@@ -127,10 +134,11 @@ async def yellowTowers():
     # calibration
     await db.turn(90)
     await db.straight(-300)
+    hub.imu.reset_heading(0)
 
 
     # placing second tower
-    await moveUntilColor(15,40)
+    await moveUntilColor(15,40, 100) # add distance
     await multitask(async_wrapper(db.straight, 335), moveAttachmentArms(40, -260))
     await db.turn(-90)
     await db.straight(190)
