@@ -32,11 +32,16 @@ async def main():
 
     gc.collect()
 
+    # calibration
     await multitask(move(-500), moveAttachmentArms(30, 450))
+
+    # picking up the towers
     await db.straight(256)
     await db.turn(-90)
     await db.straight(310)
     await moveAttachmentArms(30, -390)
+
+    # placing first tower
     await db.straight(-30)
     await db.turn(90)
     await db.straight(500)
@@ -44,14 +49,18 @@ async def main():
     await db.straight(445)
     await moveAttachmentArms(30,260)
     await db.straight(-200)
-    await moveUntilColor(15, -30)
-    await db.straight(470)
+
+    # calibration
     await db.turn(90)
     await db.straight(-300)
-
     
+    await moveUntilColor(15,30)
+    await multitask(move(305), moveAttachmentArms(30, -260))
+    await db.turn(-90)
+    await db.straight(205)
+    await moveAttachmentArms(30,260)
+    await db.straight(-200)
 
 if __name__ == "__main__":
     run_task(main())
- 
  
