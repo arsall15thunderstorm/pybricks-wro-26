@@ -67,15 +67,15 @@ def convertSpeed(speed: float) -> float:
 
 
 async def moveAttachmentArms(speed, angle):
-    speed1 = convertSpeed(-speed)
-    speed2 = convertSpeed(speed)
+    speedc = convertSpeed(speed)
+    
     
 
     async def move_right():
-        await attachment_right.run_angle(speed1, angle)
+        await attachment_right.run_angle(speedc, -angle)
         
     async def move_left():
-        await attachment_left.run_angle(speed2, angle)
+        await attachment_left.run_angle(speedc, angle)
         
     
     await multitask(move_right(), move_left())
@@ -101,13 +101,14 @@ async def moveUntilColor(reflection, speed):
     db.brake()
  
 
-async def move(mm):
-    await db.straight(mm)
+async def async_wrapper(func, *args, **kwargs):
+    return await func(*args, **kwargs)
 
 async def yellowTowers():
 
+
     # calibration
-    await multitask(move(-500), moveAttachmentArms(40, 450))
+    await multitask(async_wrapper(db.straight, -500), moveAttachmentArms(40, 450))
 
     # picking up the towers
     await db.straight(256)
@@ -131,7 +132,7 @@ async def yellowTowers():
 
     # placing second tower
     await moveUntilColor(15,40)
-    await multitask(move(335), moveAttachmentArms(40, -260))
+    await multitask(async_wrapper(db.straight, 335), moveAttachmentArms(40, -260))
     await db.turn(-90)
     await db.straight(190)
     await moveAttachmentArms(40,260)

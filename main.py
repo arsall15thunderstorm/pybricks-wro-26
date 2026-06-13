@@ -1,4 +1,4 @@
-from wrotools import db, moveUntilColor, moveAttachmentArms, move, yellowTowers, watch, resetDB
+from wrotools import db, moveUntilColor, moveAttachmentArms, yellowTowers, watch, resetDB
 from pybricks.tools import run_task, multitask
 import gc
 
