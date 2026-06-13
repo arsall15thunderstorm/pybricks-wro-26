@@ -7,7 +7,7 @@ Python and virtual environment set up with UV
 - pybricksdev package
 
 
-Prefferable to use VSCode
+Preferable to use VSCode
 
 
 
