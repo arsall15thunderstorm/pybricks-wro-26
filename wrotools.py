@@ -3,7 +3,7 @@
 # date: 9/5/2026
 
 
-import umath
+import umath, gc
 
 from pybricks.hubs import PrimeHub
 from pybricks.pupdevices import Motor, ColorSensor, UltrasonicSensor, ForceSensor
@@ -28,6 +28,7 @@ hub: PrimeHub = PrimeHub()
 left_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
 right_motor: Motor = Motor(Port.D)
 color_sensor1: ColorSensor = ColorSensor(Port.C)
+color_sensor2: ColorSensor = ColorSensor(Port.F)
 attachment_left: Motor = Motor(Port.E)
 attachment_right: Motor = Motor(Port.A)
 db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
@@ -39,7 +40,7 @@ hub.imu.reset_heading(0)
 
 # HELPER FUNCTIONS
 
-def resetDB() -> None:
+async def resetDB() -> None:
     """
     Resets the driving base
     """
@@ -48,7 +49,7 @@ def resetDB() -> None:
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
     print("reset complete")
-    wait(50)
+    await wait(50)
 
 def convertSpeed(speed: float) -> float:
     """
@@ -102,3 +103,38 @@ async def moveUntilColor(reflection, speed):
 
 async def move(mm):
     await db.straight(mm)
+
+async def yellowTowers():
+
+    # calibration
+    await multitask(move(-500), moveAttachmentArms(40, 450))
+
+    # picking up the towers
+    await db.straight(256)
+    await db.turn(-90)
+    await db.straight(310)
+    await moveAttachmentArms(40, -390)
+
+    # placing first tower
+    await db.straight(-30)
+    await db.turn(90)
+    await db.straight(500)
+    await moveUntilColor(15, 40)
+    await db.straight(440)
+    await moveAttachmentArms(40,260)
+    await db.straight(-200)
+
+    # calibration
+    await db.turn(90)
+    await db.straight(-300)
+
+
+    # placing second tower
+    await moveUntilColor(15,40)
+    await multitask(move(335), moveAttachmentArms(40, -260))
+    await db.turn(-90)
+    await db.straight(190)
+    await moveAttachmentArms(40,260)
+    await db.straight(-200)
+
+    gc.collect()
