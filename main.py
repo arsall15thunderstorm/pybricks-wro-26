@@ -37,8 +37,17 @@ async def main():
     await db.turn(-90)
     await db.straight(310)
     await moveAttachmentArms(30, -390)
-    
-
+    await db.straight(-30)
+    await db.turn(90)
+    await db.straight(500)
+    await moveUntilColor(15, 30)
+    await db.straight(445)
+    await moveAttachmentArms(30,260)
+    await db.straight(-200)
+    await moveUntilColor(15, -30)
+    await db.straight(470)
+    await db.turn(90)
+    await db.straight(-300)
 
     
 
