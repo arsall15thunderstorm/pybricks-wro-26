@@ -33,7 +33,7 @@ attachment_left: Motor = Motor(Port.E)
 attachment_right: Motor = Motor(Port.A)
 db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
 db.use_gyro(True)
-watch = StopWatch()
+watch: StopWatch = StopWatch()
 watch.reset()
 hub.imu.reset_heading(0)
 
@@ -51,36 +51,55 @@ async def resetDB() -> None:
     print("reset complete")
     await wait(50)
 
-def convertSpeed(speed: float) -> float:
+def convertSpeed(speed: int) -> float:
     """
     Converts percentage speed to degrees per second
     
     :param speed: The percentage speed being converted
-    :type speed: int
+    :type speed: int, %
     :return: The converted degrees per second measure of the percentage speed
-    :rtype: float
+    :rtype: Number, deg/s
     """
     return (speed/100) * 1050
 
 
 
-async def moveAttachmentArms(speed, angle):
-    speed1 = convertSpeed(-speed)
-    speed2 = convertSpeed(speed)
-    
+async def moveAttachmentArms(speed: int, angle: int) -> None:
+    """
+    Moves both the attachment arms at the same time
+
+    :param speed: The percentage speed that the arms will move at
+    :type speed: int, %
+    :param angle: The angle the arms will move by
+    :type angle: int, deg
+    """
+
+    speedc: float = convertSpeed(speed)
 
     async def move_right():
-        await attachment_right.run_angle(speed1, angle)
+        await attachment_right.run_angle(speedc, -angle)
         
     async def move_left():
-        await attachment_left.run_angle(speed2, angle)
+        await attachment_left.run_angle(speedc, angle)
         
     
     await multitask(move_right(), move_left())
 
 
 
-async def moveUntilColor(reflection, speed):
+async def moveUntilColor(reflection: int, speed: int, distance: int) -> None:
+    """
+    Makes the robot move until either:
+    - A. It reaches a color with a reflection below a certain threshold
+    - B. A certain distance is reached
+
+    :param reflection: The reflection threshold where the robot will stop moving
+    :type reflection: int, %
+    :param speed: The percentage speed that the bot will move at
+    :type speed: int, %
+    :param distance: The secondary distance threshold where the robot will stop
+    :type distance: int, mm
+    """
 
     async def waitForColor():
         while await color_sensor1.reflection() > reflection:
@@ -92,22 +111,50 @@ async def moveUntilColor(reflection, speed):
         while True:
             await wait(10)
     
-
+    async def detectDistance():
+        while True:
+            distance_moved = 0.6004*right_motor.angle()
+            if distance_moved >= distance:
+                break
+            await wait(10)
+        
     
-    await multitask(driveForever(), waitForColor(), race=True)
+    await resetDB()
+    
+    await multitask(driveForever(), waitForColor(), detectDistance(), race=True)
 
     db.brake()
  
 
-async def move(mm):
-    await db.straight(mm)
+async def async_wrapper(func, *args, **kwargs):
+    """
+    Forces a pybricks MaybeAwaitable function to always behave like a coroutine so that it functions with the multitask() function
 
-async def yellowTowers():
+    :param func: The method to execute.
+    :type func: Callable[..., Awaitable[Any]]
+    :param args: Positional arguments for the method
+    :type args: Any
+    :param kwargs: Keyword arguments for the method
+    :type kwargs: Any
+    :return: The resolved value from the awaited method
+    :rtype: Any
+    """
+
+    return await func(*args, **kwargs)
+
+async def yellowTowers() -> None:
+    """
+    Running the first task, which includes:
+    - Start calibration
+    - Picking up both yellow towers
+    - Moving and placing the tower tops on the bases
+    """
 
     db.settings(270, 800, 150, 300)
 
     # calibration
-    await multitask(move(-500), moveAttachmentArms(40, 430))
+    await multitask(async_wrapper(db.straight, -500), moveAttachmentArms(40, 450))
+    hub.imu.reset_heading(0)
 
     # picking up the towers
     await db.straight(256)
@@ -115,7 +162,7 @@ async def yellowTowers():
     await db.straight(310)
     await moveAttachmentArms(40, -390)
 
-    
+
 
     # placing first tower
     await db.straight(-30)
