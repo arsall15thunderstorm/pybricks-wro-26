@@ -1,4 +1,4 @@
-Pybricks code for wro 2026
+Pybricks code for WRO 2026 RoboMission Junior
 Spike PRIME
 Python and virtual environment set up with UV
 
@@ -8,6 +8,10 @@ Python and virtual environment set up with UV
 
 
 Preferable to use VSCode
+
+Robot uses standard 68.8mm EV3 wheels
+It uses 4x Spike PRIME Large Motors, 2 for movement and 2 for attachments
+For color detection it utilizes 2 color sensors, one down-facing and one side-facing
 
 
 
