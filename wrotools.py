@@ -21,7 +21,7 @@ wheel_diameter: float = 68.8
 wheel_circumference: float = wheel_diameter * pi
 distance_between_wheels: int = 200
 
-# INITIALIZATION            N, de
+# INITIALIZATION        
 
 hub: PrimeHub = PrimeHub()
 left_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
@@ -140,6 +140,9 @@ async def async_wrapper(func, *args, **kwargs):
     """
 
     return await func(*args, **kwargs)
+
+
+# MAIN FUNCTIONS
 
 async def yellowTowers() -> None:
     """
