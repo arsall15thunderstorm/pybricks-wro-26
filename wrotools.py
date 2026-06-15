@@ -106,6 +106,8 @@ async def move(mm):
 
 async def yellowTowers():
 
+    db.settings(270, 800, 150, 300)
+
     # calibration
     await multitask(move(-500), moveAttachmentArms(40, 430))
 
@@ -115,14 +117,18 @@ async def yellowTowers():
     await db.straight(310)
     await moveAttachmentArms(40, -390)
 
+    
+
     # placing first tower
     await db.straight(-30)
     await db.turn(90)
     await db.straight(500)
     await moveUntilColor(15, 40)
+    db.settings(240, 700, 120, 250)
     await db.straight(440)
-    await moveAttachmentArms(40,265)
+    await moveAttachmentArms(40,255)
     await db.straight(-200)
+    db.settings(280, 800, 160, 300)
 
     # calibration
     await db.turn(90)
@@ -131,10 +137,12 @@ async def yellowTowers():
 
     # placing second tower
     await moveUntilColor(15,40)
-    await multitask(move(335), moveAttachmentArms(40, -265))
+    await multitask(move(335), moveAttachmentArms(40, -255))
+    db.settings(240, 700, 120, 250)
     await db.turn(-90)
-    await db.straight(210)
-    await moveAttachmentArms(40,265)
+    await db.straight(200)
+    await moveAttachmentArms(40,255)
     await db.straight(-200)
+    db.settings(280, 800, 160, 300)
 
     gc.collect()

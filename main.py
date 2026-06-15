@@ -9,7 +9,7 @@ async def main():
 
     # initialization and running garbage collector
     gc.collect()
-    db.settings(280, 800, 150, 300)
+    db.settings(280, 800, 160, 300)
     #db.settings(500, 1000, 500, 600)
     watch.reset()
     watch.resume()
