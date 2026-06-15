@@ -1,1 +1,10 @@
 14/3/2026: file created
+
+... changelog not updated for 3 months but changes described in git history
+
+13/6/2026:
+
+- Completed the Yellow Towers task
+- Cleaned up the code and made the first task function
+- Introduced a new async wrapper function to save space rather than making a new wrapper function each time
+- Began planning and working on the next task
