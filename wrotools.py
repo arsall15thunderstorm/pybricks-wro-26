@@ -74,13 +74,13 @@ async def moveAttachmentArms(speed: int, angle: int) -> None:
     :type angle: int, deg
     """
 
-    speedc: float = convertSpeed(speed)
+    speed: float = convertSpeed(speed)
 
     async def move_right():
-        await attachment_right.run_angle(speedc, -angle)
+        await attachment_right.run_angle(speed, -angle)
         
     async def move_left():
-        await attachment_left.run_angle(speedc, angle)
+        await attachment_left.run_angle(speed, angle)
         
     
     await multitask(move_right(), move_left())
@@ -178,11 +178,12 @@ async def yellowTowers() -> None:
     # calibration
     await db.turn(90)
     await db.straight(-300)
+    hub.imu.reset_heading(0)
 
 
     # placing second tower
-    await moveUntilColor(15,40)
-    await multitask(move(335), moveAttachmentArms(40, -255))
+    await moveUntilColor(15, 40, 100)
+    await multitask(async_wrapper(db.straight, 335), moveAttachmentArms(40, -255))
     db.settings(240, 700, 120, 250)
     await db.turn(-90)
     await db.straight(200)
