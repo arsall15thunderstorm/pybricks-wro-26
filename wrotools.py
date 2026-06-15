@@ -106,7 +106,7 @@ async def moveUntilColor(reflection: int, speed: int, distance: int) -> None:
             await wait(10)
 
     async def driveForever():
-        db.drive(0.6*convertSpeed(speed), 0)
+        db.drive(0.6004*convertSpeed(speed), 0)
 
         while True:
             await wait(10)
