@@ -1,4 +1,4 @@
-Pybricks code for wro 2026
+PyBricks code for wro 2026
 Spike PRIME
 Python and virtual environment set up with UV
 
@@ -7,7 +7,7 @@ Python and virtual environment set up with UV
 - pybricksdev package
 
 
-Prefferable to use VSCode
+Preferable to use VSCode
 
 
 
