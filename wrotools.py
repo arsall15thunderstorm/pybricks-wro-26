@@ -57,8 +57,6 @@ def convertSpeed(speed: float) -> float:
     
     :param speed: The percentage speed being converted
     :type speed: int
-    :param isLargeMotor: Controls whether the motor is a large or medium motor
-    :type isLargeMotor: bool
     :return: The converted degrees per second measure of the percentage speed
     :rtype: float
     """
