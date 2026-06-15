@@ -28,7 +28,7 @@ hub: PrimeHub = PrimeHub()
 left_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
 right_motor: Motor = Motor(Port.D)
 color_sensor1: ColorSensor = ColorSensor(Port.C)
-color_sensor2: ColorSensor = ColorSensor(Port.F)
+#color_sensor2: ColorSensor = ColorSensor(Port.F)
 attachment_left: Motor = Motor(Port.E)
 attachment_right: Motor = Motor(Port.A)
 db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
@@ -107,7 +107,7 @@ async def move(mm):
 async def yellowTowers():
 
     # calibration
-    await multitask(move(-500), moveAttachmentArms(40, 450))
+    await multitask(move(-500), moveAttachmentArms(40, 430))
 
     # picking up the towers
     await db.straight(256)
@@ -121,7 +121,7 @@ async def yellowTowers():
     await db.straight(500)
     await moveUntilColor(15, 40)
     await db.straight(440)
-    await moveAttachmentArms(40,260)
+    await moveAttachmentArms(40,265)
     await db.straight(-200)
 
     # calibration
@@ -131,10 +131,10 @@ async def yellowTowers():
 
     # placing second tower
     await moveUntilColor(15,40)
-    await multitask(move(335), moveAttachmentArms(40, -260))
+    await multitask(move(335), moveAttachmentArms(40, -265))
     await db.turn(-90)
-    await db.straight(190)
-    await moveAttachmentArms(40,260)
+    await db.straight(210)
+    await moveAttachmentArms(40,265)
     await db.straight(-200)
 
     gc.collect()
