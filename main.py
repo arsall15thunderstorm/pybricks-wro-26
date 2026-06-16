@@ -9,7 +9,7 @@ async def main():
 
     # initialization and running garbage collector
     gc.collect()
-    db.settings(280, 800, 160, 300)
+    db.settings(240, 700, 120, 250)
     #db.settings(500, 1000, 500, 600)
     watch.reset()
     watch.resume()
@@ -20,7 +20,9 @@ async def main():
     print(watch.time()/1000)
 
     # color scanning the artifacts
-    await db.turn(180)
+    await db.turn(-90)
+    await db.straight(-50)
+    await db.turn(-90)
     await db.straight(500)
 
 if __name__ == "__main__":

@@ -4,9 +4,10 @@
 
 
 import gc
+
 import umath
 from pybricks.hubs import PrimeHub
-from pybricks.parameters import Direction, Port
+from pybricks.parameters import Direction, Port, Color
 from pybricks.pupdevices import Motor, ColorSensor
 from pybricks.robotics import DriveBase
 from pybricks.tools import wait, StopWatch, multitask
@@ -27,7 +28,7 @@ hub: PrimeHub = PrimeHub()
 left_motor: Motor = Motor(Port.B, Direction.COUNTERCLOCKWISE)
 right_motor: Motor = Motor(Port.D)
 color_sensor1: ColorSensor = ColorSensor(Port.C)
-#color_sensor2: ColorSensor = ColorSensor(Port.F)
+color_sensor2: ColorSensor = ColorSensor(Port.F)
 attachment_left: Motor = Motor(Port.E)
 attachment_right: Motor = Motor(Port.A)
 db: DriveBase = DriveBase(left_motor, right_motor, wheel_diameter, distance_between_wheels)
@@ -35,6 +36,8 @@ db.use_gyro(True)
 watch: StopWatch = StopWatch()
 watch.reset()
 hub.imu.reset_heading(0)
+validColors = [Color.RED, Color.BLUE, Color.GREEN, Color.BLACK, Color.YELLOW]
+
 
 
 # HELPER FUNCTIONS
@@ -86,7 +89,7 @@ async def moveAttachmentArms(speed: int, angle: int) -> None:
 
 
 
-async def moveUntilColor(reflection: int, speed: int, distance: int) -> None:
+async def moveUntilColor(reflection: int, speed: int, distance: int, use_distance: bool = False) -> None:
     """
     Makes the robot move until either:
     - A. It reaches a color with a reflection below a certain threshold
@@ -98,6 +101,8 @@ async def moveUntilColor(reflection: int, speed: int, distance: int) -> None:
     :type speed: int, %
     :param distance: The secondary distance threshold where the robot will stop
     :type distance: int, mm
+    :param use_distance: Controls whether to use the distance check
+    :type use_distance: bool
     """
 
     async def waitForColor():
@@ -119,11 +124,14 @@ async def moveUntilColor(reflection: int, speed: int, distance: int) -> None:
         
     
     await resetDB()
-    
-    await multitask(driveForever(), waitForColor(), detectDistance(), race=True)
+
+    if use_distance:
+        await multitask(driveForever(), waitForColor(), detectDistance(), race=True)
+    else:
+        await multitask(driveForever(), waitForColor(), race=True)
 
     db.brake()
- 
+
 
 async def async_wrapper(func, *args, **kwargs):
     """
@@ -153,7 +161,6 @@ async def yellowTowers() -> None:
 
     # calibration
     await multitask(async_wrapper(db.straight, -500), moveAttachmentArms(40, 450))
-    hub.imu.reset_heading(0)
 
     # picking up the towers
     await db.straight(256)
@@ -177,7 +184,6 @@ async def yellowTowers() -> None:
     # calibration
     await db.turn(90)
     await db.straight(-300)
-    hub.imu.reset_heading(0)
 
 
     # placing second tower
@@ -185,9 +191,33 @@ async def yellowTowers() -> None:
     await multitask(async_wrapper(db.straight, 335), moveAttachmentArms(40, -255))
     db.settings(240, 700, 120, 250)
     await db.turn(-90)
-    await db.straight(200)
+    await db.straight(205)
     await moveAttachmentArms(40,255)
     await db.straight(-200)
     db.settings(280, 800, 160, 300)
 
     gc.collect()
+
+
+async def colorScanning() -> list[Color]:
+    """
+    Scans colors (of artifacts) until a list of 4, unique, valid (as defined by list validColors) is formed
+
+    :return: The list of scanned colors
+    :rtype: list[Color]
+
+    """
+    cleanedList = []
+    while True:
+        currentScan = await color_sensor2.color()
+        print(currentScan)
+        if currentScan in validColors and currentScan not in cleanedList:
+            cleanedList.append(currentScan)
+
+        if len(cleanedList) == 4:
+            break
+
+        await wait(50)
+
+    return cleanedList
+
