@@ -3,14 +3,13 @@
 # date: 15/6/2026
 
 
-import umath, gc
-
+import gc
+import umath
 from pybricks.hubs import PrimeHub
-from pybricks.pupdevices import Motor, ColorSensor, UltrasonicSensor, ForceSensor
-from pybricks.parameters import Button, Color, Direction, Port, Side, Stop
+from pybricks.parameters import Direction, Port
+from pybricks.pupdevices import Motor, ColorSensor
 from pybricks.robotics import DriveBase
-from pybricks.tools import wait, StopWatch, run_task, multitask
-
+from pybricks.tools import wait, StopWatch, multitask
 
 # MATH STUFF
 
@@ -168,7 +167,7 @@ async def yellowTowers() -> None:
     await db.straight(-30)
     await db.turn(90)
     await db.straight(500)
-    await moveUntilColor(15, 40)
+    await moveUntilColor(15, 40, 100) #fill distance properly
     db.settings(240, 700, 120, 250)
     await db.straight(440)
     await moveAttachmentArms(40,255)
@@ -182,7 +181,7 @@ async def yellowTowers() -> None:
 
 
     # placing second tower
-    await moveUntilColor(15, 40, 100)
+    await moveUntilColor(15, 40, 100) # fill distance properly
     await multitask(async_wrapper(db.straight, 335), moveAttachmentArms(40, -255))
     db.settings(240, 700, 120, 250)
     await db.turn(-90)
