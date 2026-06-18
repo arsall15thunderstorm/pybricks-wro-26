@@ -12,10 +12,11 @@ async def main():
     """await db.turn(-90)
     await db.straight(-50)
     await db.turn(-90)
-    await db.straight(-50)
+    await db.straight(-50)+
     await db.straight(500)"""
     db.settings(120, 400, 120, 250)
-    print(await multitask(async_wrapper(db.straight, 5000), colorScanning(), race=True ))
+    #print(await multitask(async_wrapper(db.straight, 5000), colorScanning(), race=True ))
+    await colorScanning()
 
 
 

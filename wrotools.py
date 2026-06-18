@@ -53,7 +53,7 @@ async def resetDB() -> None:
     print("reset complete")
     await wait(50)
 
-def convertSpeed(speed: int) -> float:
+def convertSpeed(speed: float) -> float:
     """
     Converts percentage speed to degrees per second
     
@@ -66,7 +66,7 @@ def convertSpeed(speed: int) -> float:
 
 
 
-async def moveAttachmentArms(speed: int, angle: int) -> None:
+async def moveAttachmentArms(speed: float, angle: int) -> None:
     """
     Moves both the attachment arms at the same time
 
@@ -76,7 +76,7 @@ async def moveAttachmentArms(speed: int, angle: int) -> None:
     :type angle: int, deg
     """
 
-    speed: float = convertSpeed(speed)
+    speed = convertSpeed(speed)
 
     async def move_right():
         await attachment_right.run_angle(speed, -angle)
@@ -208,13 +208,30 @@ async def colorScanning() -> list[Color]:
 
     """
     cleanedList = []
+    black_debounce_count = 0
+
     while True:
+        currentReflection = await color_sensor2.reflection()
         currentScan = await color_sensor2.color()
-        print(currentScan)
-        if currentScan in validColors and currentScan not in cleanedList:
-            cleanedList.append(currentScan)
+        currentHSV = await color_sensor2.hsv()
+        finalDebounce = 3
+        if 3 <= currentReflection <= 10:
+            black_debounce_count += 1
+            if black_debounce_count >= finalDebounce:
+                if Color.BLACK not in cleanedList:
+                    cleanedList.append(Color.BLACK)
+                print(Color.BLACK, currentReflection, currentHSV)
+        elif currentScan in validColors:
+            black_debounce_count = 0
+            if currentScan not in cleanedList:
+                cleanedList.append(currentScan)
+            print(currentScan, currentReflection, currentHSV)
+        else:
+            black_debounce_count = 0
+            print(Color.NONE, currentReflection, currentHSV)
 
         if len(cleanedList) == 4:
+            print(cleanedList)
             break
 
         await wait(50)
