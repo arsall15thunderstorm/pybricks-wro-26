@@ -26,6 +26,7 @@ async def main():
     await db.straight(-77)
     await db.turn(-90)
     await db.straight(-80)
+    await db.turn(-3)
     colors = await multitask(async_wrapper(db.straight, 500), colorScanning())
 
 
