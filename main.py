@@ -1,5 +1,3 @@
-from pybricks.parameters import Color
-
 from wrotools import db, yellowTowers, watch, resetDB, async_wrapper, colorScanning
 from pybricks.tools import run_task, multitask
 import gc
@@ -11,7 +9,7 @@ async def main():
 
     # initialization and running garbage collector
     gc.collect()
-    db.settings(240, 700, 120, 250)
+    db.settings(280, 700, 120, 250)
     #db.settings(500, 1000, 500, 600)
     watch.reset()
     watch.resume()
