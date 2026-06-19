@@ -1,11 +1,13 @@
-from wrotools import db, yellowTowers, watch, resetDB
-from pybricks.tools import run_task
+from pybricks.parameters import Color
+
+from wrotools import db, yellowTowers, watch, resetDB, async_wrapper, colorScanning
+from pybricks.tools import run_task, multitask
 import gc
 
 
 
 async def main():
-    """the main function"""
+    """the main function :)"""
 
     # initialization and running garbage collector
     gc.collect()
@@ -21,9 +23,12 @@ async def main():
 
     # color scanning the artifacts
     await db.turn(-90)
-    await db.straight(-50)
+    await db.straight(-77)
     await db.turn(-90)
-    await db.straight(500)
+    await db.straight(-80)
+    colors = await multitask(async_wrapper(db.straight, 500), colorScanning())
+
+
 
 if __name__ == "__main__":
     run_task(main())
