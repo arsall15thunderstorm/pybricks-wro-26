@@ -20,7 +20,7 @@ pi: float = umath.pi
 
 wheel_diameter: float = 68.8
 wheel_circumference: float = wheel_diameter * pi
-distance_between_wheels: int = 200
+distance_between_wheels: int = 205
 
 # INITIALIZATION            
 
@@ -60,7 +60,7 @@ def convertSpeed(speed: float) -> float:
     :param speed: The percentage speed being converted
     :type speed: int, %
     :return: The converted degrees per second measure of the percentage speed
-    :rtype: Number, deg/s
+    :rtype: Number, deg/st
     """
     return (speed/100) * 1050
 
@@ -164,7 +164,8 @@ async def yellowTowers() -> None:
 
     # picking up the towers
     await db.straight(256)
-    await db.turn(-90)
+    await db.turn(-89)
+    db.settings(180, 650, 150, 300)
     await db.straight(310)
     await moveAttachmentArms(40, -390)
 
@@ -176,7 +177,7 @@ async def yellowTowers() -> None:
     await db.straight(500)
     await moveUntilColor(15, 40, 100) #fill distance properly
     db.settings(240, 700, 120, 250)
-    await db.straight(440)
+    await db.straight(443)
     await moveAttachmentArms(40,255)
     await db.straight(-200)
     db.settings(280, 800, 160, 300)
@@ -220,15 +221,14 @@ async def colorScanning() -> list[Color]:
             if black_debounce_count >= finalDebounce:
                 if Color.BLACK not in cleanedList:
                     cleanedList.append(Color.BLACK)
-                print(Color.BLACK, currentReflection, currentHSV)
+                    print(Color.BLACK, currentReflection, currentHSV)
         elif currentScan in validColors:
             black_debounce_count = 0
             if currentScan not in cleanedList:
                 cleanedList.append(currentScan)
-            print(currentScan, currentReflection, currentHSV)
+                print(currentScan, currentReflection, currentHSV)
         else:
             black_debounce_count = 0
-            print(Color.NONE, currentReflection, currentHSV)
 
         if len(cleanedList) == 4:
             print(cleanedList)
