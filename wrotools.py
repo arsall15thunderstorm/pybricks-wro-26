@@ -89,7 +89,7 @@ async def moveAttachmentArms(speed: float, angle: int) -> None:
 
 
 
-async def moveUntilColor(reflection: int, speed: int, distance: int, use_distance: bool = False) -> None:
+async def moveUntilColor(reflection: int, speed: int, distance: int = 0, use_distance: bool = False) -> None:
     """
     Makes the robot move until either:
     - A. It reaches a color with a reflection below a certain threshold
@@ -165,7 +165,8 @@ async def yellowTowers() -> None:
     # picking up the towers
     await db.straight(256)
     await db.turn(-89)
-    db.settings(180, 650, 150, 300)
+    await moveUntilColor(14,50)
+    db.settings(100, 650, 150, 300)
     await db.straight(310)
     await moveAttachmentArms(40, -390)
 
