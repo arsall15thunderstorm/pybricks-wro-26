@@ -163,11 +163,13 @@ async def yellowTowers() -> None:
     await multitask(async_wrapper(db.straight, -500), moveAttachmentArms(40, 450))
 
     # picking up the towers
-    await db.straight(256)
+    db.settings(200,600,120,300)
+    await db.straight(255)
     await db.turn(-89)
-    await moveUntilColor(14,50)
-    db.settings(100, 650, 150, 300)
+    await db.turn(1)
+    db.stop()
     await db.straight(310)
+    db.settings(250, 650, 150, 300)
     await moveAttachmentArms(40, -390)
 
 
