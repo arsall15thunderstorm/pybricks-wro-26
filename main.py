@@ -36,8 +36,8 @@ async def main():
     await db.turn(90)
     await db.straight(230)
     await db.turn(90)
-    await db.straight(250)
-    await moveAttachmentArms(30, 260)
+    await db.straight(220)
+    await moveAttachmentArms(30, 250)
     await db.turn(180)
     await db.straight(600)
 if __name__ == "__main__":
