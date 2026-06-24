@@ -28,7 +28,8 @@ async def main():
     await db.straight(-80)
     await db.turn(-3)
     db.settings(210, 700, 150, 300)
-    colors = await multitask(async_wrapper(db.straight, 670), colorScanning())[0]
+    colors = await multitask(async_wrapper(db.straight, 670), colorScanning())
+    colors = colors[0]
 
     # picking up artifacts
     await moveAttachmentArms(40,-270)
