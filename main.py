@@ -1,3 +1,5 @@
+from pybricks.parameters import Color
+
 from wrotools import db, yellowTowers, watch, resetDB, async_wrapper, colorScanning, moveAttachmentArms, hub
 from pybricks.tools import run_task, multitask
 import gc
@@ -26,7 +28,7 @@ async def main():
     await db.straight(-80)
     await db.turn(-3)
     db.settings(210, 700, 150, 300)
-    colors = await multitask(async_wrapper(db.straight, 670), colorScanning())
+    colors = await multitask(async_wrapper(db.straight, 670), colorScanning())[0]
 
     # picking up artifacts
     await moveAttachmentArms(40,-270)
@@ -40,6 +42,16 @@ async def main():
     await moveAttachmentArms(30, 250)
     await db.turn(180)
     await db.straight(600)
+
+    #color thingy
+
+    if colors[3] == Color.YELLOW:
+        await db.turn(90)
+        await db.straight(120)
+        await db.turn(-90)
+        await db.straight(60)
+        await moveAttachmentArms(40,270)
+
 if __name__ == "__main__":
     run_task(main())
 

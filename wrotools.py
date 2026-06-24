@@ -164,23 +164,26 @@ async def yellowTowers() -> None:
 
     # picking up the towers
     db.settings(200,600,120,300)
-    await db.straight(255)
-    await db.turn(-89)
-    await db.turn(1)
+    await db.straight(260)
+    await db.turn(-90)
     db.stop()
-    await db.straight(310)
+    db.settings(250,400,150,300)
+    await db.straight(200)
+    db.settings(150,300,120,300)
+    await db.straight(110)
     db.settings(250, 650, 150, 300)
     await moveAttachmentArms(40, -390)
 
 
 
     # placing first tower
-    await db.straight(-30)
+    db.settings(400,650,150,300)
+    await db.straight(-27)
     await db.turn(90)
     await db.straight(500)
-    await moveUntilColor(15, 40, 100) #fill distance properly
+    await moveUntilColor(20, 45, 100) #fill distance properly
     db.settings(240, 700, 120, 250)
-    await db.straight(443)
+    await db.straight(430)
     await moveAttachmentArms(40,255)
     await db.straight(-200)
     db.settings(280, 800, 160, 300)
@@ -191,7 +194,7 @@ async def yellowTowers() -> None:
 
 
     # placing second tower
-    await moveUntilColor(15, 40, 100) # fill distance properly
+    await moveUntilColor(20, 40, 100) # fill distance properly
     await multitask(async_wrapper(db.straight, 335), moveAttachmentArms(40, -250))
     db.settings(240, 700, 120, 250)
     await db.turn(-90)
@@ -199,6 +202,8 @@ async def yellowTowers() -> None:
     await moveAttachmentArms(40,255)
     await db.straight(-100)
     db.settings(280, 800, 160, 300)
+
+
 
     gc.collect()
 
