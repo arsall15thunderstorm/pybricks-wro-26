@@ -21,7 +21,6 @@ pi: float = umath.pi
 wheel_diameter: float = 68.8
 wheel_circumference: float = wheel_diameter * pi
 distance_between_wheels: int = 205
-cleanedList: list[Color] = []
 # INITIALIZATION            
 
 hub: PrimeHub = PrimeHub()
@@ -194,7 +193,7 @@ async def yellowTowers() -> None:
 
     # picking up the towers
     db.settings(200,600,120,300)
-    await db.straight(260)
+    await db.straight(252)
     await db.turn(-90)
     db.stop()
     db.settings(210,400,150,300)
@@ -229,7 +228,7 @@ async def yellowTowers() -> None:
     await multitask(async_wrapper(db.straight, 328), moveAttachmentArms(40, -250))
     db.settings(240, 700, 120, 250)
     await db.turn(-90)
-    await db.straight(210)
+    await db.straight(215)
     await moveAttachmentArms(38,255)
     await db.straight(-100)
     db.settings(280, 800, 160, 300)
@@ -239,41 +238,5 @@ async def yellowTowers() -> None:
     gc.collect()
 
 
-async def colorScanning() -> list[Color]:
-    """
-    Scans colors (of artifacts) until a list of 4, unique, valid (as defined by list validColors) is formed
 
-    :return: The list of scanned colors
-    :rtype: list[Color]
-
-    """
-    cleanedList = []
-    black_debounce_count = 0
-
-    while True:
-        currentReflection = await color_sensor2.reflection()
-        currentScan = await color_sensor2.color()
-        currentHSV = await color_sensor2.hsv()
-        finalDebounce = 3
-        if 3 <= currentReflection <= 10:
-            black_debounce_count += 1
-            if black_debounce_count >= finalDebounce:
-                if Color.BLACK not in cleanedList:
-                    cleanedList.append(Color.BLACK)
-                    print(Color.BLACK, currentReflection, currentHSV)
-        elif currentScan in validColors:
-            black_debounce_count = 0
-            if currentScan not in cleanedList:
-                cleanedList.append(currentScan)
-                print(currentScan, currentReflection, currentHSV)
-        else:
-            black_debounce_count = 0
-
-        if len(cleanedList) == 4:
-            print(cleanedList)
-            break
-
-        await wait(50)
-    print(cleanedList[3])
-    return cleanedList
     
