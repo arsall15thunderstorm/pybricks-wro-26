@@ -193,10 +193,10 @@ async def yellowTowers() -> None:
 
     # picking up the towers
     db.settings(200,600,120,300)
-    await db.straight(252)
+    await db.straight(268)
     await db.turn(-90)
     db.stop()
-    db.settings(210,400,150,300)
+    db.settings(260,400,150,300)
     await db.straight(200)
     db.settings(150,300,120,300)
     await db.straight(110)
@@ -233,6 +233,43 @@ async def yellowTowers() -> None:
     await db.straight(-100)
     db.settings(280, 800, 160, 300)
 
+async def colorScanning() -> list[Color]:
+    """
+    Scans colors (of artifacts) until a list of 4, unique, valid (as defined by list validColors) is formed
+
+    :return: The list of scanned colors
+    :rtype: list[Color]
+
+    """
+    cleanedList = []
+    black_debounce_count = 0
+
+    while True:
+        currentReflection = await color_sensor2.reflection()
+        currentScan = await color_sensor2.color()
+        currentHSV = await color_sensor2.hsv()
+        finalDebounce = 3
+        if 3 <= currentReflection <= 10:
+            black_debounce_count += 1
+            if black_debounce_count >= finalDebounce:
+                if Color.BLACK not in cleanedList:
+                    cleanedList.append(Color.BLACK)
+                    print(Color.BLACK, currentReflection, currentHSV)
+        elif currentScan in validColors:
+            black_debounce_count = 0
+            if currentScan not in cleanedList:
+                cleanedList.append(currentScan)
+                print(currentScan, currentReflection, currentHSV)
+        else:
+            black_debounce_count = 0
+
+        if len(cleanedList) == 4:
+            print(cleanedList)
+            break
+
+        await wait(50)
+
+    return cleanedList
 
 
     gc.collect()

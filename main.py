@@ -1,46 +1,9 @@
 from pybricks.parameters import Color
 
-from wrotools import db, yellowTowers, watch, resetDB, async_wrapper, colorScanning, moveAttachmentArms, hub, cleanedList, moveLeftArm, moveRightArm
+from wrotools import db, yellowTowers, watch, resetDB, async_wrapper, colorScanning, moveAttachmentArms, hub, moveLeftArm, moveRightArm
 from pybricks.tools import run_task, multitask
 import gc
 
-async def colorScanning() -> list[Color]:
-    """
-    Scans colors (of artifacts) until a list of 4, unique, valid (as defined by list validColors) is formed
-
-    :return: The list of scanned colors
-    :rtype: list[Color]
-
-    """
-    cleanedList = []
-    black_debounce_count = 0
-
-    while True:
-        currentReflection = await color_sensor2.reflection()
-        currentScan = await color_sensor2.color()
-        currentHSV = await color_sensor2.hsv()
-        finalDebounce = 3
-        if 3 <= currentReflection <= 10:
-            black_debounce_count += 1
-            if black_debounce_count >= finalDebounce:
-                if Color.BLACK not in cleanedList:
-                    cleanedList.append(Color.BLACK)
-                    print(Color.BLACK, currentReflection, currentHSV)
-        elif currentScan in validColors:
-            black_debounce_count = 0
-            if currentScan not in cleanedList:
-                cleanedList.append(currentScan)
-                print(currentScan, currentReflection, currentHSV)
-        else:
-            black_debounce_count = 0
-
-        if len(cleanedList) == 4:
-            print(cleanedList)
-            break
-
-        await wait(50)
-    print(cleanedList[3])
-    return cleanedList
 
 async def main():
     """the main function :)"""
@@ -80,8 +43,10 @@ async def main():
     await db.turn(180)
     await db.straight(600)
 
+    finalColors = await colorScanning()
+    print()
     #color thingy
-    if cleanedList[3] == "Color.YELLOW":    
+    if finalColors[3] == Color.YELLOW:    
         await db.turn(3)
         await db.turn(90)
         await db.straight(400)
