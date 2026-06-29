@@ -21,7 +21,6 @@ pi: float = umath.pi
 wheel_diameter: float = 68.8
 wheel_circumference: float = wheel_diameter * pi
 distance_between_wheels: int = 205
-
 # INITIALIZATION            
 
 hub: PrimeHub = PrimeHub()
@@ -87,7 +86,37 @@ async def moveAttachmentArms(speed: float, angle: int) -> None:
     
     await multitask(move_right(), move_left())
 
+async def moveRightArm(speed: float, angle: int) -> None:
+    """
+    Moves both the attachment arms at the same time
 
+    :param speed: The percentage speed that the arms will move at
+    :type speed: int, %
+    :param angle: The angle the arms will move by
+    :type angle: int, deg
+    """
+
+    speed = convertSpeed(speed)
+
+    async def move_right():
+        await attachment_right.run_angle(speed, -angle)
+    await move_right()
+
+async def moveLeftArm(speed: float, angle: int) -> None:
+    """
+    Moves both the attachment arms at the same time
+
+    :param speed: The percentage speed that the arms will move at
+    :type speed: int, %
+    :param angle: The angle the arms will move by
+    :type angle: int, deg
+    """
+
+    speed = convertSpeed(speed)
+
+    async def move_left():
+        await attachment_left.run_angle(speed, angle)
+    await move_left()
 
 async def moveUntilColor(reflection: int, speed: int, distance: int = 0, use_distance: bool = False) -> None:
     """
@@ -164,10 +193,10 @@ async def yellowTowers() -> None:
 
     # picking up the towers
     db.settings(200,600,120,300)
-    await db.straight(260)
+    await db.straight(268)
     await db.turn(-90)
     db.stop()
-    db.settings(250,400,150,300)
+    db.settings(260,400,150,300)
     await db.straight(200)
     db.settings(150,300,120,300)
     await db.straight(110)
@@ -177,10 +206,10 @@ async def yellowTowers() -> None:
 
 
     # placing first tower
-    db.settings(400,650,150,300)
-    await db.straight(-27)
+    db.settings(500,650,150,300)
+    await db.straight(-35)
     await db.turn(90)
-    await db.straight(500)
+    await db.straight(503)
     await moveUntilColor(20, 45, 100) #fill distance properly
     db.settings(240, 700, 120, 250)
     await db.straight(430)
@@ -194,19 +223,15 @@ async def yellowTowers() -> None:
 
 
     # placing second tower
+    db.settings(450,600,150,300)
     await moveUntilColor(20, 40, 100) # fill distance properly
-    await multitask(async_wrapper(db.straight, 335), moveAttachmentArms(40, -250))
+    await multitask(async_wrapper(db.straight, 328), moveAttachmentArms(40, -250))
     db.settings(240, 700, 120, 250)
     await db.turn(-90)
-    await db.straight(210)
-    await moveAttachmentArms(40,255)
+    await db.straight(215)
+    await moveAttachmentArms(38,255)
     await db.straight(-100)
     db.settings(280, 800, 160, 300)
-
-
-
-    gc.collect()
-
 
 async def colorScanning() -> list[Color]:
     """
@@ -246,3 +271,9 @@ async def colorScanning() -> list[Color]:
 
     return cleanedList
 
+
+    gc.collect()
+
+
+
+    
